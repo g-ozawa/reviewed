@@ -1,0 +1,15 @@
+{
+  "event": "pull_request_review",
+  "payload": {
+    "action": "submitted",
+    "repository": {
+      "id": 1234,
+      "name": "test",
+      "full_name": "reviewed/test",
+      "owner": {
+        "login": "reviewed",
+        "id": 3456
+      }
+    }
+  }
+}

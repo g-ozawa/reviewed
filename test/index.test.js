@@ -1,10 +1,66 @@
-// You can import your modules
-// const index = require('../index')
+const { createRobot } = require('probot')
+const plugin = require('..')
+const event = require('./fixtures/event')
 
-test('that we can run tests', () => {
-  // your real tests go here
-  expect(1 + 2 + 3).toBe(6)
+describe('reviewed', () => {
+  let robot
+  let github
+
+  beforeEach(() => {
+    robot = createRobot()
+    plugin(robot)
+
+    github = {
+      repos: {
+        getContent: jest.fn().mockReturnValue(Promise.resolve({
+          data: {
+            content: Buffer.from(`reviewed`).toString('base64')
+          }
+        }))
+      },
+      issues: {
+        addLabels: jest.fn().mockReturnValue(Promise.resolve())
+      },
+      pullRequests: {
+        getReviews: jest.fn().mockReturnValue(Promise.resolve({
+          data: [
+            {
+              user: {
+                login: 'test-reviewer'
+              },
+              state: 'APPROVED'
+            }
+          ]
+        })),
+        getReviewRequests: jest.fn().mockReturnValue(Promise.resolve({
+          data: {
+            users: []
+          }
+        })),
+        get: jest.fn().mockReturnValue(Promise.resolve({
+          data: {
+            user: {
+              login: 'test-author'
+            }
+          }
+        }))
+      }
+    }
+
+    robot.auth = () => Promise.resolve(github)
+  })
+
+  test('that required API calls are made', async () => {
+    await robot.receive(event)
+
+    expect(github.pullRequests.getReviews).toHaveBeenCalled()
+    expect(github.pullRequests.getReviewRequests).toHaveBeenCalled()
+    expect(github.pullRequests.get).toHaveBeenCalled()
+  })
+
+  test('that proper labels have been applied to an pull request', async () => {
+    await robot.receive(event)
+
+    expect(github.issues.addLabels).toHaveBeenCalled()
+  })
 })
-
-// For more information about testing with Jest see:
-// https://facebook.github.io/jest/
