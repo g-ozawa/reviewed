@@ -1,6 +1,6 @@
 # reviewed
 
-** reviewed ** is a Github App built with [probot](https://github.com/probot/probot) that automatically add label to pull request when all of reviewers approved.
+**reviewed** is a Github App built with [probot](https://github.com/probot/probot) that automatically add label to pull request when all of reviewers approved.
 
 # Usage
 1. **[Install the app](https://github.com/apps/reviewed)**.
